@@ -2,8 +2,8 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { Id64, Id64Array, Id64String } from "@bentley/bentleyjs-core";
-import { BackgroundMapProps, ColorDef } from "@bentley/imodeljs-common";
+import { Id64, Id64Array, Id64String, CompressedId64Set } from "@bentley/bentleyjs-core";
+import { BackgroundMapProps, ColorDef, PlanarClipMaskMode, PlanarClipMaskProps } from "@bentley/imodeljs-common";
 import {
   AuthorizedFrontendRequestContext, DrawingViewState, Environment, IModelApp, IModelConnection,
   SpatialViewState, ViewState,
@@ -87,6 +87,14 @@ export class ViewSetup {
           nadirColor: ColorDef.computeTbgrFromComponents(64, 74, 66),
         },
       });
+
+      if (imodel.name === "CoffsHarborDemo")
+        displayStyle.changeBackgroundMapProps({
+          planarClipMask: {
+            mode: PlanarClipMaskMode.Priority,
+            transparency: 0.25,
+          },
+        });
     }
 
     const hiddenCategories = await ViewSetup.getHiddenCategories(imodel);
