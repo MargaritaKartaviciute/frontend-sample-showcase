@@ -7,6 +7,7 @@ import { Range1dProps, Vector3d } from "@bentley/geometry-core";
 import {
   BackgroundMapSettings,
   GlobeMode,
+  PlanarClipMaskMode,
   TerrainHeightOriginMode,
   TerrainSettings,
   ThematicDisplay,
@@ -68,7 +69,7 @@ export default class ThematicDisplayApp {
       applyTerrain: true,
       globeMode: GlobeMode.Plane, // If the user zooms out enough, the curve of the earth can effect the thematic display.
       useDepthBuffer: true,
-      transparency: 0.75,
+      transparency: 0.25,
       terrainSettings: TerrainSettings.fromJSON({ heightOriginMode: TerrainHeightOriginMode.Geoid }),
     });
     vp.synchWithView();

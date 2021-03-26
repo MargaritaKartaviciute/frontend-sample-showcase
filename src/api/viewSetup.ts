@@ -5,7 +5,7 @@
 import { Id64, Id64Array, Id64String, CompressedId64Set } from "@bentley/bentleyjs-core";
 import { BackgroundMapProps, ColorDef, PlanarClipMaskMode, PlanarClipMaskProps } from "@bentley/imodeljs-common";
 import {
-  AuthorizedFrontendRequestContext, DrawingViewState, Environment, IModelApp, IModelConnection,
+  AuthorizedFrontendRequestContext, DrawingViewState, EmphasizeElements, Environment, IModelApp, IModelConnection,
   SpatialViewState, ViewState,
 } from "@bentley/imodeljs-frontend";
 import { SettingsMapResult, SettingsStatus } from "@bentley/product-settings-client";
@@ -88,13 +88,14 @@ export class ViewSetup {
         },
       });
 
-      if (imodel.name === "CoffsHarborDemo")
-        displayStyle.changeBackgroundMapProps({
-          planarClipMask: {
-            mode: PlanarClipMaskMode.Priority,
-            transparency: 0.25,
-          },
-        });
+      // if (imodel.name === "Metrostation2") {
+      //   displayStyle.changeBackgroundMapProps({
+      //     planarClipMask: {
+      //       mode: PlanarClipMaskMode.IncludeSubCategories,
+      //       subCategoryOrElementIds: CompressedId64Set.compressIds(["0x2000002906c"]),
+      //     },
+      //   });
+      // }
     }
 
     const hiddenCategories = await ViewSetup.getHiddenCategories(imodel);

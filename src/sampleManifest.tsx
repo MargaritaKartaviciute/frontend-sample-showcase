@@ -67,6 +67,7 @@ import { getSimpleAnimatedSpec } from "./frontend-samples/geometry-samples/simpl
 import { getParticleFireSampleSpec } from "frontend-samples/fire-decoration-sample/sampleSpec";
 import { getExplodeSpec } from "frontend-samples/explode-sample/sampleSpec";
 import { getIotAlertSpec } from "./frontend-samples/iot-alert-sample/sampleSpec";
+import { getModelMaskingSpec } from "frontend-samples/model-masking-sample/sampleSpec";
 
 export interface SampleSpecGroup {
   groupName: string;
@@ -93,6 +94,7 @@ export const sampleManifest: SampleSpecGroup[] = [{
     getImageExportSpec(),
     getCrossProbingSpec(),
     getMarkerPinSpec(),
+    getModelMaskingSpec(),
     getMultiViewportSpec(),
     getParticleFireSampleSpec(),
     getPropertyFormattingSpec(),
