@@ -68,6 +68,7 @@ import { getParticleFireSampleSpec } from "frontend-samples/fire-decoration-samp
 import { getExplodeSpec } from "frontend-samples/explode-sample/sampleSpec";
 import { getIotAlertSpec } from "./frontend-samples/iot-alert-sample/sampleSpec";
 import { getModelMaskingSpec } from "frontend-samples/model-masking-sample/sampleSpec";
+import { getParticleSnowSampleSpec } from "frontend-samples/snow-decoration-sample/sampleSpec";
 
 export interface SampleSpecGroup {
   groupName: string;
@@ -97,6 +98,7 @@ export const sampleManifest: SampleSpecGroup[] = [{
     getModelMaskingSpec(),
     getMultiViewportSpec(),
     getParticleFireSampleSpec(),
+    getParticleSnowSampleSpec(),
     getPropertyFormattingSpec(),
     getSerializeViewSpec(),
     getScreenSpaceEffectsSpec(),
