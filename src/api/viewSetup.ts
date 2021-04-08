@@ -56,6 +56,7 @@ export class ViewSetup {
 
   /** Makes ascetic changes to the default view */
   public static async overrideView(imodel: IModelConnection, viewState: ViewState) {
+    console.debug("viewSetup", viewState.viewFlags.backgroundMap);
     const aspect = ViewSetup.getAspectRatio();
     if (undefined !== aspect) {
       const extents = viewState.getExtents();
