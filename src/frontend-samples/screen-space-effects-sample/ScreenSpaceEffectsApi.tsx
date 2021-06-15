@@ -5,7 +5,6 @@
 
 import { assert } from "@bentley/bentleyjs-core";
 import { IModelApp } from "@bentley/imodeljs-frontend";
-import "common/samples-common.scss";
 import { effects } from "./Effects";
 
 export default class ScreenSpaceEffectsApi {

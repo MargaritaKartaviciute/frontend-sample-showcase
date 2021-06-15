@@ -2,8 +2,6 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-
-import "common/samples-common.scss";
 import { HitDetail, imageElementFromUrl, ToolAdmin } from "@bentley/imodeljs-frontend";
 
 export enum ElemProperty {
@@ -35,7 +33,7 @@ export class ShowcaseToolAdmin extends ToolAdmin {
   private static _singleton: ShowcaseToolAdmin;
 
   public static initialize(): ShowcaseToolAdmin {
-    if(!ShowcaseToolAdmin._singleton)
+    if (!ShowcaseToolAdmin._singleton)
       ShowcaseToolAdmin._singleton = new ShowcaseToolAdmin();
     return ShowcaseToolAdmin._singleton;
   }

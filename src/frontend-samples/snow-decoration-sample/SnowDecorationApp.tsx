@@ -4,7 +4,6 @@
 *--------------------------------------------------------------------------------------------*/
 
 import * as React from "react";
-import "common/samples-common.scss";
 import { IModelConnection } from "@bentley/imodeljs-frontend";
 import { Viewer } from "@bentley/itwin-viewer-react";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";

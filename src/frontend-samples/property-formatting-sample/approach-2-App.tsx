@@ -4,7 +4,6 @@
 *--------------------------------------------------------------------------------------------*/
 
 import * as React from "react";
-import "common/samples-common.scss";
 import { Table } from "@bentley/ui-components";
 import { PropertyFormattingApi, PropertyProps } from "./PropertyFormattingApi";
 import { PresentationTableDataProvider } from "@bentley/presentation-components";

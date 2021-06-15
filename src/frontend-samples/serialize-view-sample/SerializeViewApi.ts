@@ -5,7 +5,6 @@
 
 import { ViewStateProps } from "@bentley/imodeljs-common";
 import { EntityState, IModelConnection, Viewport, ViewState } from "@bentley/imodeljs-frontend";
-import "common/samples-common.scss";
 
 export default class SerializeViewApi {
 

@@ -4,11 +4,9 @@
 *--------------------------------------------------------------------------------------------*/
 import { Id64String } from "@bentley/bentleyjs-core";
 import { Point3d, Range1d, Range2d, Range3d, Vector3d, XYAndZ } from "@bentley/geometry-core";
-import "@bentley/icons-generic-webfont/dist/bentley-icons-generic-webfont.css";
 import { Placement3d, RenderTexture } from "@bentley/imodeljs-common";
 import { Decorator, imageElementFromUrl, IModelApp, IModelConnection, ScreenViewport, Viewport } from "@bentley/imodeljs-frontend";
 import { I18NNamespace } from "@bentley/imodeljs-i18n";
-import "common/samples-common.scss";
 import { EmitterHighlighter, FireEmitter, FireParams } from "./FireDecorator";
 import { PlacementTool } from "./PlacementTool";
 

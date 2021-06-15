@@ -8,7 +8,6 @@ import ReactDOM from "react-dom";
 import { App } from "./Components/App/App";
 import * as serviceWorker from "./serviceWorker";
 import "./index.scss";
-import "@bentley/icons-generic-webfont/dist/bentley-icons-generic-webfont.css";
 
 ReactDOM.render(
   <App />,
