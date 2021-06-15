@@ -139,11 +139,6 @@
       "typedef": true
     },
     {
-      "name": "api/showcasetooladmin",
-      "import": "./src/api/showcasetooladmin",
-      "typedef": true
-    },
-    {
       "name": "common/UIComponents/UIComponentContainer",
       "import": "./src/common/UIComponents/UIComponentContainer",
       "typedef": true
@@ -154,18 +149,8 @@
       "typedef": true
     },
     {
-      "name": "common/PointSelector/PointGenerators",
-      "import": "./src/common/PointSelector/PointGenerators",
-      "typedef": true
-    },
-    {
       "name": "common/PointSelector/PointSelector",
       "import": "./src/common/PointSelector/PointSelector",
-      "typedef": true
-    },
-    {
-      "name": "common/SandboxViewport/ViewportAndNavigation",
-      "import": "./src/common/SandboxViewport/ViewportAndNavigation",
       "typedef": true
     },
     {
@@ -176,11 +161,6 @@
     {
       "name": "common/SandboxIModelConnection/SandboxIModelConnection",
       "import": "./src/common/SandboxIModelConnection/SandboxIModelConnection",
-      "typedef": true
-    },
-    {
-      "name": "Components/Widgets/SmallStatusBar",
-      "import": "./src/Components/Widgets/SmallStatusBar",
       "typedef": true
     },
     {
@@ -218,22 +198,22 @@
     {
       "name": "@itwinjs-sandbox/view/DefaultViewerProps",
       "import": "./src/@itwinjs-sandbox/view/DefaultViewerProps",
-      "typedef": true
+      "typedef": "./src/@itwinjs-sandbox/view/DefaultViewerProps"
     },
     {
       "name": "@itwinjs-sandbox/components/imodel-selector/IModelSelector",
       "import": "./src/@itwinjs-sandbox/components/imodel-selector/IModelSelector",
-      "typedef": true
+      "typedef": "./src/@itwinjs-sandbox/components/imodel-selector/IModelSelector"
     },
     {
       "name": "@itwinjs-sandbox/components/imodel-selector/SampleWidgetProvider",
       "import": "./src/@itwinjs-sandbox/components/imodel-selector/SampleWidgetProvider",
-      "typedef": true
+      "typedef": "./src/@itwinjs-sandbox/components/imodel-selector/SampleWidgetProvider"
     },
     {
       "name": "@itwinjs-sandbox/hooks/useSampleIModelConnection",
       "import": "./src/@itwinjs-sandbox/hooks/useSampleIModelConnection",
-      "typedef": true
+      "typedef": "./src/@itwinjs-sandbox/hooks/useSampleIModelConnection"
     },
     {
       "name": "@itwinjs-sandbox/hooks/useSampleWidget",
@@ -243,22 +223,22 @@
     {
       "name": "@itwinjs-sandbox/view/ViewSetup",
       "import": "./src/@itwinjs-sandbox/view/ViewSetup",
-      "typedef": true
+      "typedef": "./src/@itwinjs-sandbox/view/ViewSetup"
     },
     {
       "name": "@itwinjs-sandbox/constants",
       "import": "./src/@itwinjs-sandbox/constants",
-      "typedef": true
+      "typedef": "./src/@itwinjs-sandbox/constants"
     },
     {
       "name": "@itwinjs-sandbox/SampleIModels",
       "import": "./src/@itwinjs-sandbox/SampleIModels",
-      "typedef": true
+      "typedef": "./src/@itwinjs-sandbox/SampleIModels"
     },
     {
       "name": "@itwinjs-sandbox",
       "import": "./src/@itwinjs-sandbox/index",
-      "typedef": true
+      "typedef": "./src/@itwinjs-sandbox/index"
     }
   ]
 }
