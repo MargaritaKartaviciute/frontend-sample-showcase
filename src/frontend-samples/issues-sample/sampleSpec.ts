@@ -17,7 +17,7 @@ export function getIssuesSpec(): SampleSpec {
     iTwinViewerReady: true,
     readme: async () => import("!!raw-loader!./readme.md"),
     files: () => [
-      { name: "IssuesApi.tsx", import: import("!editor-file-loader!./IssuesApi") },
+      { name: "IssuesApi.ts", import: import("!editor-file-loader!./IssuesApi") },
       { name: "IssuesApp.tsx", import: import("!editor-file-loader!./IssuesApp"), entry: true },
       { name: "IssuesWidget.tsx", import: import("!editor-file-loader!./IssuesWidget") },
       { name: "IssuesClient.ts", import: import("!editor-file-loader!./IssuesClient") },
