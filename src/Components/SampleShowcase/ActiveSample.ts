@@ -3,6 +3,7 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 
+import type { Annotation } from "@bentley/monaco-editor";
 import { defaultIModel, defaultIModelList } from "@itwinjs-sandbox/constants";
 import { SampleIModels } from "@itwinjs-sandbox/SampleIModels";
 import { sampleManifest } from "sampleManifest";
@@ -16,6 +17,7 @@ interface SpecResolveResult {
 
 export class ActiveSample {
   private _spec: SampleSpec;
+  private _walkthrough?: Annotation[];
   public group: string;
   public name: string;
   public imodel: SampleIModels;
@@ -24,6 +26,18 @@ export class ActiveSample {
   public getFiles?: () => SampleSpecFile[];
   public type: string;
   public galleryVisible: boolean = true;
+
+  public get walkthrough() {
+    if (this._walkthrough) {
+      const initialStep: Annotation = {
+        index: 0,
+        markdown: `This panel will give you a guided tour of the ${this.name.split("-").map((word) => word[0].toUpperCase() + word.substr(1)).join(" ")} code sample. Please use the → button below to start the tour. Or you can browse through and jump directly to any step using the control above. During the tour, the ◯ button will recenter the code editor.`,
+        title: "Welcome",
+      };
+      return [initialStep, ...this._walkthrough];
+    }
+    return undefined;
+  }
 
   constructor(group?: string | null, name?: string | null, imodel?: SampleIModels | null) {
     const params = new URLSearchParams(window.location.search);
@@ -41,6 +55,7 @@ export class ActiveSample {
     this.iTwinViewerReady = result.spec.iTwinViewerReady;
     this.getFiles = result.spec.files;
     this.getReadme = result.spec.readme;
+    this._walkthrough = result.spec.walkthrough;
     this.type = result.spec.type || "";
 
     updateURLParams(this.group, this.name, this.imodel);
