@@ -11,8 +11,8 @@ export function getMarkerPinSpec(): SampleSpec {
     name: "marker-pin-sample",
     label: "Marker Pins",
     image: "marker-pin-thumbnail.png",
-    description: "Uses a #Decorator and a #MarkerSet to display #markers that indicate important locations in a model.",
     walkthrough,
+    description: "Uses a #Decorator and a #MarkerSet to display #markers that indicate important locations in a model.",
     iTwinViewerReady: true,
     readme: async () => import("!!raw-loader!./readme.md"),
     files: () => [

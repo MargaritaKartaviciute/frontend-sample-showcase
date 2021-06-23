@@ -12,8 +12,8 @@ export function getEmphasizeElementsSpec(): SampleSpec {
     name: "emphasize-elements-sample",
     label: "Emphasize Elements",
     image: "emphasize-elements-thumbnail.png",
-    description: "How to #emphasize, #hide, #isolate, and #override the #color of elements using the #EmphasizeElements API.",
     walkthrough,
+    description: "How to #emphasize, #hide, #isolate, and #override the #color of elements using the #EmphasizeElements API.",
     readme: async () => import("!!raw-loader!./readme.md"),
     files: () => [
       { name: "EmphasizeElementsApi.tsx", import: import("!editor-file-loader!./EmphasizeElementsApi") },
