@@ -5,6 +5,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
+// START CLIENTCREATION
 import { Point3d } from "@bentley/geometry-core";
 import { AuthorizedClientRequestContext } from "@bentley/itwin-client";
 
@@ -1315,3 +1316,4 @@ export class IssuesClient<SecurityDataType extends unknown> extends HttpClient<S
       }),
   };
 }
+// END CLIENTCREATION

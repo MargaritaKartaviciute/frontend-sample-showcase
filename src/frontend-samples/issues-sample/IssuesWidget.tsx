@@ -43,6 +43,7 @@ const IssuesWidget: React.FunctionComponent = () => {
     };
   }, []);
 
+  // START PROJECTISSUES
   /** When iModel is loaded, get issue details */
   useEffect(() => {
     (async () => {
@@ -67,7 +68,9 @@ const IssuesWidget: React.FunctionComponent = () => {
       }
     })();
   }, [iModelConnection, issues]);
+  // END PROJECTISSUES
 
+  // START ISSUEATTACHMENTS
   /** Set the privew Images on issue load */
   useEffect(() => {
     issues.map(async (issue) => {
@@ -88,7 +91,9 @@ const IssuesWidget: React.FunctionComponent = () => {
       }
     });
   }, [issues]);
+  // END ISSUEATTACHMENTS
 
+  // START ISSUELOCATION
   const applyView = useCallback(async (issue: IssueGet) => {
     /** apply the camera position if present */
     if (viewport?.view.is3d()) {
@@ -105,6 +110,7 @@ const IssuesWidget: React.FunctionComponent = () => {
       }
     }
   }, [viewport]);
+  // END ISSUELOCATION
 
   /** Create the issue marker icon, then add the pin at the issue location */
   useEffect(() => {
@@ -184,6 +190,7 @@ const IssuesWidget: React.FunctionComponent = () => {
     });
   }, [currentIssue, issueAttachmentMetaData, issueAttachments]);
 
+  // START ISSUECOMMENTS
   /** call the client to get the issue comments */
   const getIssueComments = useCallback(async () => {
     /** If the comments have already been retrieved don't refetch*/
@@ -198,7 +205,9 @@ const IssuesWidget: React.FunctionComponent = () => {
     /** Set the comments */
     setIssueComments((prevState) => ({ ...prevState, [currentIssue.displayName as string]: comments }));
   }, [currentIssue, issueComments]);
+  // END ISSUECOMMENTS
 
+  // START ISSUEAUDITTRAIL
   /** call the client to get the issue Audit trail */
   const getIssueAuditTrail = useCallback(async () => {
     /** If the comments have already been retrieved don't refetch*/
@@ -213,6 +222,7 @@ const IssuesWidget: React.FunctionComponent = () => {
     /** Set the audit trail for the currentIssue */
     setIssueAuditTrails((prevState) => ({ ...prevState, [currentIssue.displayName as string]: auditTrail }));
   }, [currentIssue, issueAuditTrails]);
+  // END ISSUEAUDITTRAIL
 
   /** Make the client request when the tab for the issue is selected. */
   const onTabSelected = (index: number) => {

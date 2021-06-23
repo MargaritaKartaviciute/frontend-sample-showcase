@@ -13,6 +13,7 @@ export default class IssuesApi {
   private static _issueClient: IssuesClient<unknown>;
   public static _issuesPinDecorator?: MarkerPinDecorator;
 
+  // START CLIENTACCESSOR
   public static async getClient() {
     if (!IssuesApi._issueClient) {
       const context = await AuthorizedFrontendRequestContext.create();
@@ -21,6 +22,7 @@ export default class IssuesApi {
     }
     return IssuesApi._issueClient;
   }
+  // END CLIENTACCESSOR
 
   public static decoratorIsSetup() {
     return (null != this._issuesPinDecorator);
