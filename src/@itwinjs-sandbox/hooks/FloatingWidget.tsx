@@ -2,6 +2,7 @@ import { IDisposable } from "@bentley/bentleyjs-core";
 import { StagePanelLocation, StagePanelSection, UiItemProviderRegisteredEventArgs, UiItemsManager, UiItemsProvider, WidgetState } from "@bentley/ui-abstract";
 import { FrontstageManager } from "@bentley/ui-framework";
 import React, { createElement } from "react";
+import ResizeObserver from "resize-observer-polyfill";
 
 export class FloatingWidgets implements IDisposable {
   private _container: HTMLElement;

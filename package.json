@@ -48,6 +48,7 @@
     "react-merge-refs": "^1.1.0",
     "react-redux": "^7.2.0",
     "redux": "^4.0.3",
+    "resize-observer-polyfill": "^1.5.1",
     "tooltip.js": "^1.2.0",
     "typescript": "^3.9.6"
   },
