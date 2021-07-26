@@ -3,14 +3,15 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from "react";
 import { IModelApp } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
-import { AuthorizationClient } from "@itwinjs-sandbox/authentication/AuthorizationClient";
-import { DisplayError } from "Components/ErrorBoundary/ErrorDisplay";
+// import { DisplayError } from "Components/ErrorBoundary/ErrorDisplay";
 import { UiFramework } from "@bentley/ui-framework";
-import { Spinner, SpinnerSize, UiCore } from "@bentley/ui-core";
+import { UiCore } from "@bentley/ui-core";
 import { UiComponents } from "@bentley/ui-components";
+import { SampleVisualizerContent } from "./SampleVisualizerContent";
+import { AuthorizationClient } from "@itwinjs-sandbox/authentication/AuthorizationClient";
 const context = (require as any).context("./../../frontend-samples", true, /\.tsx$/);
 
 interface SampleVisualizerProps {
@@ -18,11 +19,6 @@ interface SampleVisualizerProps {
   iModelName: string;
   iModelSelector: React.ReactNode;
   transpileResult?: string;
-}
-
-interface SampleProps {
-  iModelName: string;
-  iModelSelector: React.ReactNode;
 }
 
 const iModelAppShutdown = async (): Promise<void> => {
@@ -69,72 +65,44 @@ const iModelAppShutdown = async (): Promise<void> => {
   }
 };
 
-export const SampleVisualizer: FunctionComponent<SampleVisualizerProps> = ({ type, transpileResult, iModelName, iModelSelector }) => {
-  const [sampleUi, setSampleUi] = useState<React.ReactNode>();
-  const [appReady, setAppReady] = useState<boolean>(false);
-  const [cleaning, setCleaning] = useState<boolean>(false);
+export const SampleVisualizer: FunctionComponent<SampleVisualizerProps> = ({ type, transpileResult }) => {
+  const [componentType, setComponentType] = useState<React.ComponentClass | undefined>();
+  const [key, setKey] = useState<number>(Math.random() * 100);
 
   useEffect(() => {
-    setAppReady(false);
-    setCleaning(true);
-    iModelAppShutdown()
-      .then(() => {
-        setCleaning(false);
-      })
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error);
-      });
-  }, [type, transpileResult, iModelName, iModelSelector]);
-
-  useEffect(() => {
-    if (sampleUi && !cleaning) {
-      AuthorizationClient
-        .initializeOidc()
-        .then(() => {
-          setAppReady(true);
-        })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.error(error);
-        });
-    }
-  }, [sampleUi, cleaning]);
-
-  // Set sample UI
-  useEffect(() => {
-    const key = context.keys().find((k: string) => k.includes(type));
-    try {
-      if (key) {
-        const component = context(key).default as React.ComponentClass<SampleProps>;
-        setSampleUi(React.createElement(component, { iModelName, iModelSelector, key: Math.random() * 100 }));
-      } else {
-        setSampleUi(<div>Failed to resolve sample &quot;{type}&quot;</div>);
+    (async () => {
+      await iModelAppShutdown();
+      await AuthorizationClient.initializeOidc();
+      let module: { default: React.ComponentClass } | undefined;
+      if (transpileResult) {
+        module = await import( /* webpackIgnore: true */ transpileResult);
       }
-    } catch (error) {
-      setSampleUi(<DisplayError error={error} />);
-    }
-  }, [type, iModelName, iModelSelector]);
+      const key = context.keys().find((k: string) => k.includes(type));
+      if (key) {
+        const component = context(key);
+        module = component;
+      }
+      if (module !== undefined) {
+        setComponentType(() => module!.default);
+      }
+    })().catch((_err) => {
+      setComponentType(undefined);
+      // eslint-disable-next-line no-console
+      // console.error(error);
+    });
 
-  // Refresh sample UI on transpile
-  useEffect(() => {
-    if (transpileResult) {
-      import( /* webpackIgnore: true */ transpileResult).then((module) => {
-        const component = module.default as React.ComponentClass<SampleProps>;
-        setSampleUi(React.createElement(component, { iModelName, iModelSelector }));
-      })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.error(error);
-        });
-    }
-  }, [transpileResult, iModelName, iModelSelector]);
+    return () => {
+      setComponentType(undefined);
+    };
+  }, [type, transpileResult]);
 
-  if (!appReady || !sampleUi || cleaning) {
-    return (<div className="uicore-fill-centered"><Spinner size={SpinnerSize.XLarge} /></div>);
-  }
+  const onError = useCallback(async () => {
+    await iModelAppShutdown();
+    await AuthorizationClient.initializeOidc();
+    setKey(Math.random() * 100);
+  }, []);
 
-  return <>{sampleUi}</>;
+  return <SampleVisualizerContent key={key} classComponent={componentType} onError={onError} />;
 };
 
 export default React.memo(SampleVisualizer, (prevProps, nextProps) => {
