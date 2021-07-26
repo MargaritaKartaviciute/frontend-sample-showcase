@@ -3,10 +3,9 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 
-import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from "react";
+import React, { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { IModelApp } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
-// import { DisplayError } from "Components/ErrorBoundary/ErrorDisplay";
 import { UiFramework } from "@bentley/ui-framework";
 import { UiCore } from "@bentley/ui-core";
 import { UiComponents } from "@bentley/ui-components";
@@ -67,7 +66,7 @@ const iModelAppShutdown = async (): Promise<void> => {
 
 export const SampleVisualizer: FunctionComponent<SampleVisualizerProps> = ({ type, transpileResult }) => {
   const [componentType, setComponentType] = useState<React.ComponentClass | undefined>();
-  const [key, setKey] = useState<number>(Math.random() * 100);
+  const [sampleKey, setSampleKey] = useState<number>(Math.random() * 100);
 
   useEffect(() => {
     (async () => {
@@ -99,10 +98,10 @@ export const SampleVisualizer: FunctionComponent<SampleVisualizerProps> = ({ typ
   const onError = useCallback(async () => {
     await iModelAppShutdown();
     await AuthorizationClient.initializeOidc();
-    setKey(Math.random() * 100);
+    setSampleKey(Math.random() * 100);
   }, []);
 
-  return <SampleVisualizerContent key={key} classComponent={componentType} onError={onError} />;
+  return <SampleVisualizerContent key={sampleKey} classComponent={componentType} onError={onError} />;
 };
 
 export default React.memo(SampleVisualizer, (prevProps, nextProps) => {
