@@ -11,7 +11,6 @@
 
   .core-tree {
     height: 100%;
-    overflow-y: hidden;
   }
 
   .tree-header {
@@ -31,11 +30,6 @@
   .tree-wrapper {
     height: 100%;
     width: 100%;
-
-    >div {
-      height: 100% !important;
-      width: 100% !important;
-    }
   }
 
   .table-node {
