@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 import { AuthStatus, BeEvent, BentleyError, ClientRequestContext, Config } from "@bentley/bentleyjs-core";
 import { AccessToken, AccessTokenProps } from "@bentley/itwin-client";
-import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
+import { BrowserAuthorizationClient, FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 
 export class AuthorizationClient implements FrontendAuthorizationClient {
   public readonly onUserStateChanged: BeEvent<(token: AccessToken | undefined) => void>;
@@ -13,8 +13,8 @@ export class AuthorizationClient implements FrontendAuthorizationClient {
 
   private static _oidcClient: FrontendAuthorizationClient;
 
-  public static get oidcClient(): FrontendAuthorizationClient {
-    return this._oidcClient;
+  public static get oidcClient(): BrowserAuthorizationClient {
+    return this._oidcClient as BrowserAuthorizationClient;
   }
 
   private static _initialized: boolean = false;
