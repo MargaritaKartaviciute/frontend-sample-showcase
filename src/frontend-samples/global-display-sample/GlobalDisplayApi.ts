@@ -33,7 +33,7 @@ export class GlobalDisplayApi {
   }
 
   // A view of Honolulu.
-  public static readonly getInitialView = async (imodel: IModelConnection) => {
+  public static readonly getInitialView = (imodel: IModelConnection) => {
 
     const viewDefinitionProps: SpatialViewDefinitionProps = {
       angles: { pitch: 36.514347, roll: -152.059851, yaw: -7.099313 },

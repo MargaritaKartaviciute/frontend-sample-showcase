@@ -3,7 +3,7 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { AuthorizationClient, default3DSandboxUi, SampleIModels, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { Viewer } from "@itwin/web-viewer-react";
 import { IModelConnection, ViewState } from "@bentley/imodeljs-frontend";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
@@ -13,11 +13,11 @@ import { Angle, Point3d, Vector3d, YawPitchRollAngles } from "@bentley/geometry-
 const uiProviders = [new ClassifierWidgetProvider()];
 
 const ClassifierApp: FunctionComponent = () => {
-  const sampleIModelInfo = useSampleWidget("Use controls below to create a classifier.", [{ context: SampleIModels.MetroStation, imodel: "Philadelphia" }]);
+  const sampleIModelInfo = useSampleWidget("Use controls below to create a classifier.", [SampleIModels.Philadelphia]);
   const [viewportOptions, setViewportOptions] = useState<IModelViewportControlOptions>();
 
   /** Initializes viewport to set up camera looking at Rittenhouse Square. */
-  const getClassifierView = async (imodel: IModelConnection): Promise<ViewState> => {
+  const getClassifierView = useCallback(async (imodel: IModelConnection): Promise<ViewState> => {
     const viewState = await ViewSetup.getDefaultView(imodel);
 
     if (viewState.is3d()) {
@@ -31,12 +31,12 @@ const ClassifierApp: FunctionComponent = () => {
     viewState.setExtents(new Vector3d(750, 393, 375));
 
     return viewState;
-  };
+  }, []);
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
+  const _oniModelReady = useCallback(async (iModelConnection: IModelConnection) => {
     const viewState = await getClassifierView(iModelConnection);
     setViewportOptions({ viewState });
-  };
+  }, [getClassifierView]);
 
   /** The sample's render method */
   return (

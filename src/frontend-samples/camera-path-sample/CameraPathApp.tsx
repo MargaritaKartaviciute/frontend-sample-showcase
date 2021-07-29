@@ -3,7 +3,7 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { AuthorizationClient, default3DSandboxUi, SampleIModels, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { Viewer } from "@itwin/web-viewer-react";
 import { IModelConnection, ViewState } from "@bentley/imodeljs-frontend";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
@@ -22,10 +22,10 @@ const CameraPathApp: FunctionComponent = () => {
     return viewState;
   };
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
+  const _oniModelReady = useCallback(async (iModelConnection: IModelConnection) => {
     const viewState = await getInitialView(iModelConnection);
     setViewportOptions({ viewState });
-  };
+  }, []);
 
   /** Remove unnecessary tools  */
   const uiConfig = {

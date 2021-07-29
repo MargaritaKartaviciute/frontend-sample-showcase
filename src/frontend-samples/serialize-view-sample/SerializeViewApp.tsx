@@ -3,9 +3,9 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { AuthorizationClient, default3DSandboxUi, SampleIModels, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { Viewer } from "@itwin/web-viewer-react";
-import { IModelConnection } from "@bentley/imodeljs-frontend";
+import { ScreenViewport } from "@bentley/imodeljs-frontend";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
 import { SerializeViewWidgetProvider } from "./SerializeViewWidget";
 import { IModelViews, sampleViewStates } from "./SampleViewStates";
@@ -18,22 +18,22 @@ const SerializeViewApp: FunctionComponent = () => {
   const sampleIModelInfo = useSampleWidget("Use the controls below to change the view attributes.", [SampleIModels.MetroStation, SampleIModels.RetailBuilding]);
   const [viewportOptions, setViewportOptions] = useState<IModelViewportControlOptions>();
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
+  const viewportConfigurer = useCallback(async (viewport: ScreenViewport) => {
     /** Grab the IModel with views that match the imodel loaded. */
     const iModelWithViews = allSavedViews.filter((iModelViews) => {
-      return iModelViews.iModelId === iModelConnection.iModelId;
+      return iModelViews.iModelId === viewport.iModel.iModelId;
     });
 
     /** Grab the views of the iModel just loaded and load the first view state in the SampleViewStates.ts */
     if (iModelWithViews.length > 0) {
       const views = iModelWithViews[0].views;
-      const viewState = await SerializeViewApi.deserializeViewState(iModelConnection, views[0].view);
+      const viewState = await SerializeViewApi.deserializeViewState(viewport.iModel, views[0].view);
       setViewportOptions({ viewState });
     } else {
-      const viewState = await ViewSetup.getDefaultView(iModelConnection);
+      const viewState = await ViewSetup.getDefaultView(viewport.iModel);
       setViewportOptions({ viewState });
     }
-  };
+  }, [allSavedViews]);
 
   /** The sample's render method */
   return (
@@ -45,7 +45,7 @@ const SerializeViewApp: FunctionComponent = () => {
           iModelId={sampleIModelInfo.iModelId}
           authConfig={{ oidcClient: AuthorizationClient.oidcClient }}
           viewportOptions={viewportOptions}
-          onIModelConnected={_oniModelReady}
+          viewCreatorOptions={{ viewportConfigurer }}
           defaultUiConfig={default3DSandboxUi}
           theme="dark"
           uiProviders={uiProviders}

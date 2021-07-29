@@ -3,7 +3,7 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { AuthorizationClient, default3DSandboxUi, ViewSetup } from "@itwinjs-sandbox";
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { Viewer } from "@itwin/web-viewer-react";
 import { HeatmapDecoratorWidgetProvider } from "./HeatmapDecoratorWidget";
 import { IModelConnection, StandardViewId } from "@bentley/imodeljs-frontend";
@@ -17,30 +17,23 @@ const HeatmapDecoratorApp: FunctionComponent = () => {
   const sampleIModelInfo = useSampleWidget("Use the options below to control the heatmap visualization.");
   const [viewportOptions, setViewportOptions] = useState<IModelViewportControlOptions>();
 
-  const _oniModelReady = (iModelConnection: IModelConnection) => {
-    ViewSetup.getDefaultView(iModelConnection)
-      .then((viewState) => {
-        if (viewState.is3d()) {
-          // To make the heatmap look better, lock the view to a top orientation with camera turned off.
-          viewState.setAllow3dManipulations(false);
-          viewState.turnCameraOff();
-          viewState.setStandardRotation(StandardViewId.Top);
-        }
+  const _onIModelReady = useCallback(async (iModelConnection: IModelConnection) => {
+    const viewState = await ViewSetup.getDefaultView(iModelConnection);
+    if (viewState.is3d()) {
+      // To make the heatmap look better, lock the view to a top orientation with camera turned off.
+      viewState.setAllow3dManipulations(false);
+      viewState.turnCameraOff();
+      viewState.setStandardRotation(StandardViewId.Top);
+    }
 
-        const range = viewState.computeFitRange();
-        const aspect = ViewSetup.getAspectRatio();
+    const range = viewState.computeFitRange();
+    const aspect = ViewSetup.getAspectRatio();
 
-        viewState.lookAtVolume(range, aspect);
-
-        // The heatmap looks better against a white background.
-        viewState.displayStyle.backgroundColor = ColorDef.white;
-        setViewportOptions({ viewState });
-      })
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error);
-      });
-  };
+    viewState.lookAtVolume(range, aspect);
+    // The heatmap looks better against a white background.
+    viewState.displayStyle.backgroundColor = ColorDef.white;
+    setViewportOptions({ viewState });
+  }, []);
 
   /** The sample's render method */
   return (
@@ -52,7 +45,7 @@ const HeatmapDecoratorApp: FunctionComponent = () => {
           iModelId={sampleIModelInfo.iModelId}
           authConfig={{ oidcClient: AuthorizationClient.oidcClient }}
           viewportOptions={viewportOptions}
-          onIModelConnected={_oniModelReady}
+          onIModelConnected={_onIModelReady}
           defaultUiConfig={default3DSandboxUi}
           theme="dark"
           uiProviders={uiProviders}

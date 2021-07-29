@@ -3,9 +3,9 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { AuthorizationClient, default3DSandboxUi, SampleIModels, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { Viewer } from "@itwin/web-viewer-react";
-import { IModelApp, IModelConnection, ScreenViewport } from "@bentley/imodeljs-frontend";
+import { IModelApp, ScreenViewport } from "@bentley/imodeljs-frontend";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
 import { SwipingComparisonWidgetProvider } from "./SwipingComparisonWidget";
 import { DividerComponent } from "./Divider";
@@ -26,15 +26,15 @@ const SwipingComparisonApp: FunctionComponent = () => {
     return () => { unSubscribe(); };
   }, []);
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
+  const viewportConfigurer = useCallback(async (viewport: ScreenViewport) => {
     IModelApp.viewManager.onViewOpen.addOnce((_vp: ScreenViewport) => {
       setBoundsState(SwipingComparisonApi.getClientRect(_vp));
       const dividerPos = initPositionDivider(SwipingComparisonApi.getClientRect(_vp));
       setDividerLeftState(dividerPos);
     });
-    const viewState = await ViewSetup.getDefaultView(iModelConnection);
+    const viewState = await ViewSetup.getDefaultView(viewport.iModel);
     setViewportOptions({ viewState });
-  };
+  }, []);
 
   // Returns the position the divider will start at based on the bounds of the divider
   const initPositionDivider = (bounds: ClientRect): number => {
@@ -63,7 +63,7 @@ const SwipingComparisonApp: FunctionComponent = () => {
             iModelId={sampleIModelInfo.iModelId}
             authConfig={{ oidcClient: AuthorizationClient.oidcClient }}
             viewportOptions={viewportOptions}
-            onIModelConnected={_oniModelReady}
+            viewCreatorOptions={{ viewportConfigurer }}
             defaultUiConfig={default3DSandboxUi}
             theme="dark"
             uiProviders={uiProviders}

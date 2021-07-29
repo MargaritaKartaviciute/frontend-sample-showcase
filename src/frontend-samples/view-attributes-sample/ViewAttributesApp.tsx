@@ -3,10 +3,10 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { AuthorizationClient, default3DSandboxUi, SampleIModels, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { Viewer } from "@itwin/web-viewer-react";
 import { ViewAttributesWidgetProvider } from "./ViewAttributesWidget";
-import { IModelApp, IModelConnection, ScreenViewport } from "@bentley/imodeljs-frontend";
+import { ScreenViewport } from "@bentley/imodeljs-frontend";
 import { ViewAttributesApi } from "./ViewAttributesApi";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
 
@@ -16,14 +16,12 @@ const ViewAttributesApp: FunctionComponent = () => {
   const sampleIModelInfo = useSampleWidget("Use the controls below to change the view attributes.", [SampleIModels.House, SampleIModels.MetroStation]);
   const [viewportOptions, setViewportOptions] = useState<IModelViewportControlOptions>();
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
-    IModelApp.viewManager.onViewOpen.addOnce(async (_vp: ScreenViewport) => {
-      ViewAttributesApi.setAttrValues(_vp, ViewAttributesApi.settings);
-    });
+  const viewportConfigurer = useCallback(async (viewport: ScreenViewport) => {
+    ViewAttributesApi.setAttrValues(viewport, ViewAttributesApi.settings);
 
-    const viewState = await ViewSetup.getDefaultView(iModelConnection);
+    const viewState = await ViewSetup.getDefaultView(viewport.iModel);
     setViewportOptions({ viewState });
-  };
+  }, []);
 
   /** The sample's render method */
   return (
@@ -35,7 +33,7 @@ const ViewAttributesApp: FunctionComponent = () => {
           iModelId={sampleIModelInfo.iModelId}
           authConfig={{ oidcClient: AuthorizationClient.oidcClient }}
           viewportOptions={viewportOptions}
-          onIModelConnected={_oniModelReady}
+          viewCreatorOptions={{ viewportConfigurer }}
           defaultUiConfig={default3DSandboxUi}
           theme="dark"
           uiProviders={uiProviders}

@@ -3,9 +3,9 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { AuthorizationClient, default3DSandboxUi, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { Viewer } from "@itwin/web-viewer-react";
-import { IModelConnection, StandardViewId, ViewState } from "@bentley/imodeljs-frontend";
+import { IModelConnection, ScreenViewport, StandardViewId, ViewState } from "@bentley/imodeljs-frontend";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
 import { MarkerPinWidgetProvider } from "./MarkerPinWidget";
 
@@ -30,10 +30,10 @@ const MarkerPinApp: FunctionComponent = () => {
     return viewState;
   };
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
-    const viewState = await getTopView(iModelConnection);
+  const viewportConfigurer = useCallback(async (viewport: ScreenViewport) => {
+    const viewState = await getTopView(viewport.iModel);
     setViewportOptions({ viewState });
-  };
+  }, []);
 
   /** The sample's render method */
   return (
@@ -45,7 +45,7 @@ const MarkerPinApp: FunctionComponent = () => {
           iModelId={sampleIModelInfo.iModelId}
           authConfig={{ oidcClient: AuthorizationClient.oidcClient }}
           viewportOptions={viewportOptions}
-          onIModelConnected={_oniModelReady}
+          viewCreatorOptions={{ viewportConfigurer }}
           defaultUiConfig={default3DSandboxUi}
           theme="dark"
           uiProviders={uiProviders}

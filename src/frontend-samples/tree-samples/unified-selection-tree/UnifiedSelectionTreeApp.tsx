@@ -2,8 +2,8 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import React, { FunctionComponent, useState } from "react";
-import { IModelConnection } from "@bentley/imodeljs-frontend";
+import React, { FunctionComponent, useCallback, useState } from "react";
+import { ScreenViewport } from "@bentley/imodeljs-frontend";
 import { Viewer } from "@itwin/web-viewer-react";
 import { AuthorizationClient, default3DSandboxUi, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
@@ -15,10 +15,10 @@ const UnifiedSelectionApp: FunctionComponent = () => {
   const sampleIModelInfo = useSampleWidget("This tree synchronizes node selections with the viewport. Selecting nodes will cause their corresponding visuals to be highlighted.");
   const [viewportOptions, setViewportOptions] = useState<IModelViewportControlOptions>();
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
-    const viewState = await ViewSetup.getDefaultView(iModelConnection);
+  const viewportConfigurer = useCallback(async (viewport: ScreenViewport) => {
+    const viewState = await ViewSetup.getDefaultView(viewport.iModel);
     setViewportOptions({ viewState });
-  };
+  }, []);
 
   return (
     <>
@@ -32,7 +32,7 @@ const UnifiedSelectionApp: FunctionComponent = () => {
           defaultUiConfig={default3DSandboxUi}
           uiProviders={uiProviders}
           theme="dark"
-          onIModelConnected={_oniModelReady}
+          viewCreatorOptions={{ viewportConfigurer }}
         />
       }
     </>

@@ -3,9 +3,9 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { AuthorizationClient, default3DSandboxUi, SampleIModels, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { Viewer } from "@itwin/web-viewer-react";
-import { IModelConnection } from "@bentley/imodeljs-frontend";
+import { ScreenViewport } from "@bentley/imodeljs-frontend";
 import { IModelViewportControlOptions, MessageRenderer } from "@bentley/ui-framework";
 import { IotAlertWidgetProvider } from "./IotAlertWidget";
 
@@ -15,10 +15,10 @@ const IotAlertApp: FunctionComponent = () => {
   const sampleIModelInfo = useSampleWidget("Use the controls below to change the iModel.", [SampleIModels.BayTown]);
   const [viewportOptions, setViewportOptions] = useState<IModelViewportControlOptions>();
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
-    const viewState = await ViewSetup.getDefaultView(iModelConnection);
+  const viewportConfigurer = useCallback(async (viewport: ScreenViewport) => {
+    const viewState = await ViewSetup.getDefaultView(viewport.iModel);
     setViewportOptions({ viewState });
-  };
+  }, []);
 
   /** The sample's render method */
   return (
@@ -31,7 +31,7 @@ const IotAlertApp: FunctionComponent = () => {
           iModelId={sampleIModelInfo.iModelId}
           authConfig={{ oidcClient: AuthorizationClient.oidcClient }}
           viewportOptions={viewportOptions}
-          onIModelConnected={_oniModelReady}
+          viewCreatorOptions={{ viewportConfigurer }}
           defaultUiConfig={default3DSandboxUi}
           theme="dark"
           uiProviders={uiProviders}

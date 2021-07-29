@@ -3,9 +3,8 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 
-import * as React from "react";
-import "common/samples-common.scss";
-import { IModelConnection } from "@bentley/imodeljs-frontend";
+import React, { FunctionComponent, useCallback, useState } from "react";
+import { ScreenViewport } from "@bentley/imodeljs-frontend";
 import { Viewer } from "@itwin/web-viewer-react";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
 import { AuthorizationClient, default3DSandboxUi, SampleIModels } from "@itwinjs-sandbox";
@@ -15,14 +14,14 @@ import ShadowStudyApi from "./ShadowStudyApi";
 
 const uiProviders = [new ShadowStudyWidgetProvider()];
 
-const ShadowStudyApp: React.FunctionComponent = () => {
+const ShadowStudyApp: FunctionComponent = () => {
   const sampleIModelInfo = useSampleWidget("Select iModel to change.", [SampleIModels.House, SampleIModels.MetroStation]);
-  const [viewportOptions, setViewportOptions] = React.useState<IModelViewportControlOptions>();
+  const [viewportOptions, setViewportOptions] = useState<IModelViewportControlOptions>();
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
-    const viewState = await ShadowStudyApi.getInitialView(iModelConnection);
+  const viewportConfigurer = useCallback(async (viewport: ScreenViewport) => {
+    const viewState = await ShadowStudyApi.getInitialView(viewport.iModel);
     setViewportOptions({ viewState });
-  };
+  }, []);
 
   /** The sample's render method */
   return (
@@ -34,7 +33,7 @@ const ShadowStudyApp: React.FunctionComponent = () => {
           iModelId={sampleIModelInfo.iModelId}
           authConfig={{ oidcClient: AuthorizationClient.oidcClient }}
           viewportOptions={viewportOptions}
-          onIModelConnected={_oniModelReady}
+          viewCreatorOptions={{ viewportConfigurer }}
           defaultUiConfig={default3DSandboxUi}
           theme="dark"
           uiProviders={uiProviders}

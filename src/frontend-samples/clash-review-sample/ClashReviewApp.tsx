@@ -2,7 +2,7 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { AuthorizationClient, default2DSandboxUi, SampleIModels, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
 import { Viewer } from "@itwin/web-viewer-react";
 import { IModelConnection, StandardViewId } from "@bentley/imodeljs-frontend";
@@ -16,7 +16,7 @@ const ClashReviewApp: FunctionComponent = () => {
   const sampleIModelInfo = useSampleWidget("Use the toggles below to show clash marker pins or zoom to a clash.  Click a marker or table entry to review clashes.", [SampleIModels.BayTown]);
   const [viewportOptions, setViewportOptions] = useState<IModelViewportControlOptions>();
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
+  const _oniModelReady = useCallback(async (iModelConnection: IModelConnection) => {
     const viewState = await ViewSetup.getDefaultView(iModelConnection);
     viewState.setStandardRotation(StandardViewId.Iso);
 
@@ -25,7 +25,7 @@ const ClashReviewApp: FunctionComponent = () => {
 
     viewState.lookAtVolume(range, aspect);
     setViewportOptions({ viewState });
-  };
+  }, []);
 
   return (
     <>

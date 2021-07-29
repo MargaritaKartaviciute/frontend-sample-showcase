@@ -3,9 +3,9 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { AuthorizationClient, default3DSandboxUi, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { Viewer, ViewerFrontstage } from "@itwin/web-viewer-react";
-import { IModelConnection } from "@bentley/imodeljs-frontend";
+import { ScreenViewport } from "@bentley/imodeljs-frontend";
 import { MultiViewportWidgetProvider } from "./MultiViewportWidget";
 import { MultiViewportFrontstage } from "./MultiViewportFrontstageProvider";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
@@ -23,15 +23,15 @@ const MultiViewportApp: FunctionComponent = () => {
     return () => { frontStages = []; };
   }, []);
 
-  const _oniModelReady = async (iModelConnection: IModelConnection) => {
-    const viewState = await ViewSetup.getDefaultView(iModelConnection);
+  const viewportConfigurer = useCallback(async (viewport: ScreenViewport) => {
+    const viewState = await ViewSetup.getDefaultView(viewport.iModel);
 
     // Remove the last frontstage, if there was one, to reinject the initalized viewstate on modelchange
     frontStages.pop();
     frontStages.push({ provider: new MultiViewportFrontstage(viewState), default: true, requiresIModelConnection: true });
 
     setViewportOptions({ viewState });
-  };
+  }, []);
 
   /** The sample's render method */
   return (
@@ -44,7 +44,7 @@ const MultiViewportApp: FunctionComponent = () => {
           authConfig={{ oidcClient: AuthorizationClient.oidcClient }}
           viewportOptions={viewportOptions}
           frontstages={frontStages}
-          onIModelConnected={_oniModelReady}
+          viewCreatorOptions={{ viewportConfigurer }}
           defaultUiConfig={default3DSandboxUi}
           theme="dark"
           uiProviders={uiProviders}
