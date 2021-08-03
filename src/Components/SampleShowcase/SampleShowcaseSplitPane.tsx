@@ -52,7 +52,7 @@ const calculateSizes = (width: number): PaneSizes => {
       },
       gallery: {
         threshold: Math.floor(width * 0.15),
-        maxSize: Math.floor(width * 0.3),
+        maxSize: Math.floor(width * 0.2),
       },
     };
   } else if (width < 768 && width >= 576) {

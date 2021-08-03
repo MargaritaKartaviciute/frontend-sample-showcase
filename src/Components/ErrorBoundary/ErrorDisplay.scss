@@ -1,23 +1,119 @@
 /*---------------------------------------------------------------------------------------------
-* Copyright (c) Bentley Systems, Incorporated. All rights reserved.
-* See LICENSE.md in the project root for license terms and full copyright notice.
-*--------------------------------------------------------------------------------------------*/
+|  $Copyright: (c) 2020 Bentley Systems, Incorporated. All rights reserved. $
+ *--------------------------------------------------------------------------------------------*/
 #error-overlay {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  background-color: white;
+  padding: 3em;
 
-  div {
-    width: 100%;
+  #error-container {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
     height: 100%;
-    padding: 3em;
+    width: 1024px;
+    max-width: 100%;
+    overflow: hidden auto;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    text-align: left;
+    font-family: Consolas, Menlo, monospace;
+    font-size: 11px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+    color: black;
 
-    code {
-      span {
-        padding-left: 1em;
+    #error-column {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
 
-        &:first-child {
-          padding-left: 0;
+      #error-message {
+        font-size: 2em;
+        font-family: sans-serif;
+        color: rgb(206, 17, 38);
+        white-space: pre-wrap;
+        margin: 0px 2rem 0.75rem 0px;
+        flex: 0 0 auto;
+        max-height: 50%;
+        overflow: auto;
+      }
+
+      #error-stack {
+        font-size: 1em;
+        flex: 0 1 auto;
+        min-height: 0px;
+        overflow: auto;
+
+        .reveal-stack {
+          cursor: pointer;
+          border: medium none;
+          display: block;
+          width: 100%;
+          text-align: left;
+          font-family: Consolas, Menlo, monospace;
+          font-size: 1em;
+          padding: 0px;
+          line-height: 1.5;
+          color: black;
+          background: white none repeat scroll 0% 0%;
+          margin-bottom: 1.5em;
+        }
+
+        .hide-stack {
+          cursor: pointer;
+          border: medium none;
+          display: block;
+          width: 100%;
+          text-align: left;
+          font-family: Consolas, Menlo, monospace;
+          font-size: 1em;
+          padding: 0px;
+          line-height: 1.5;
+          color: black;
+          background: white none repeat scroll 0% 0%;
+          margin-bottom: 0.6em;
+        }
+
+        .stack-source-container {
+          font-size: 0.9em;
+          margin-bottom: 0.9em;
+
+          .stack-source {
+            text-decoration: none;
+            color: rgb(135, 142, 145);
+            cursor: pointer;
+          }
+        }
+
+        .stack-snippet-container {
+          cursor: pointer;
+
+          pre {
+            position: relative;
+            display: block;
+            padding: 0.5em;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            border-radius: 0.25rem;
+            background-color: rgba(206, 17, 38, 0.05);
+            color: inherit;
+
+            code {
+              font-family: Consolas, Menlo, monospace;
+
+              .snippet-content {
+                color: #333333;
+              }
+            }
+          }
         }
       }
     }
