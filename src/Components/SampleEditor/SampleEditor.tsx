@@ -142,7 +142,7 @@ export const SampleEditor: React.FunctionComponent<EditorProps> = (props) => {
             <MonacoEditor />
           </div>
         </Pane>
-        {showReadme && !(enableWalkthrough && walkthrough) ?
+        {/* {showReadme && !(enableWalkthrough && walkthrough) ?
           <Pane disabled defaultSize="0" />
           :
           <Pane onChange={_onDrawerChange} snapSize={"200px"} minSize={`${drawerMinSize}px`} maxSize={"50%"} size={`${drawerSize}px`}>
@@ -150,7 +150,7 @@ export const SampleEditor: React.FunctionComponent<EditorProps> = (props) => {
               {enableWalkthrough && walkthrough && <WalkthroughViewer walkthrough={walkthrough} show={drawerSize > drawerMinSize} onOpenClick={_onDrawerOpened} onCloseClick={_onDrawerClosed} onSampleClicked={onSampleClicked} />}
               <div style={{ padding: "8px" }}><ErrorList /></div>
             </Drawer>
-          </Pane>}
+          </Pane>} */}
       </SplitScreen>
     </div >
   );

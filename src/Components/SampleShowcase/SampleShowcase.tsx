@@ -70,13 +70,11 @@ export const SampleShowcase: FunctionComponent = () => {
   const visualizer = (
     <div id="sample-container" className="sample-content" style={{ height: "100%" }}>
       <React.Suspense fallback={spinner}>
-        <ErrorBoundary key={transpileResult + activeSample.type}>
-          <Visualizer
-            iModelName={activeSample.imodel}
-            iModelSelector={getImodelSelector()}
-            transpileResult={transpileResult}
-            type={activeSample.type} />
-        </ErrorBoundary>
+        <Visualizer
+          iModelName={activeSample.imodel}
+          iModelSelector={getImodelSelector()}
+          transpileResult={transpileResult}
+          type={activeSample.type} />
       </React.Suspense>
     </div>
   );
