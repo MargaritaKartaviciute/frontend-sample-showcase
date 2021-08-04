@@ -13,14 +13,12 @@ import { AuthorizationClient } from "@itwinjs-sandbox/authentication/Authorizati
 import { DisplayError } from "Components/ErrorBoundary/ErrorDisplay";
 import { ErrorBoundary } from "Components/ErrorBoundary/ErrorBoundary";
 // import { SampleVisualizerContent } from "./SampleVisualizerContent";
-import { ProgressRadial } from "@itwin/itwinui-react";
+// import { ProgressRadial } from "@itwin/itwinui-react";
 import ReactDOM from "react-dom";
 const context = (require as any).context("./../../frontend-samples", true, /\.tsx$/);
 
 interface SampleVisualizerProps {
   type: string;
-  iModelName: string;
-  iModelSelector: React.ReactNode;
   transpileResult?: string;
 }
 
@@ -70,55 +68,44 @@ const iModelAppShutdown = async (): Promise<void> => {
   }
 };
 
-
 const SampleVisualizer: FunctionComponent<SampleVisualizerProps> = ({ type, transpileResult }) => {
   const [retryCount, setRetryCount] = useState<number>(-1);
   const ref = useRef<HTMLDivElement>(null);
+  const refProps = useRef<SampleVisualizerProps>({ type, transpileResult });
 
   useEffect(() => {
-    (async () => {
-      if (ref.current) {
-        console.log(ReactDOM.unmountComponentAtNode(ref.current));
-      }
-      setImmediate(async () => {
-        console.log("begin shutdown");
-        await iModelAppShutdown();
-        await AuthorizationClient.initializeOidc();
-        console.log("end shutdown");
+    if (ref.current) {
+      ReactDOM.unmountComponentAtNode(ref.current);
+    }
+    setImmediate(async () => {
+      await iModelAppShutdown();
 
-        let module: { default: React.ComponentClass } | undefined;
-        if (transpileResult) {
-          module = await import( /* webpackIgnore: true */ transpileResult);
-        } else {
-          const key = context.keys().find((k: string) => k.includes(type));
-          if (key) {
-            const component = context(key);
-            module = component;
-          }
+      let module: { default: React.ComponentClass } | undefined;
+      if (transpileResult) {
+        module = await import( /* webpackIgnore: true */ transpileResult);
+      } else {
+        const key = context.keys().find((k: string) => k.includes(type));
+        if (key) {
+          const component = context(key);
+          module = component;
         }
-        if (module !== undefined) {
+      }
+      await AuthorizationClient.initializeOidc();
+      await new Promise(() => {
+        if (module !== undefined && ref.current && (refProps.current.transpileResult === transpileResult || refProps.current.type === type)) {
           if (ref.current) {
             ReactDOM.render(React.createElement(module.default), ref.current);
           }
         }
       });
-    })().catch(console.error);
-  }, [type, transpileResult]);
-
-  // useEffect(() => {
-
-  // }, [])
-
-  // const onUnmount = useCallback(async () => {
-
-  // }, []);
+    });
+  }, [type, transpileResult, retryCount]);
 
   const onError = useCallback(async () => {
-    // if (retryCount < 3) {
-    //   await onUnmount();
-    //   setRetryCount((prev) => prev + 1);
-    // }
-  }, []);
+    if (retryCount < 3) {
+      setRetryCount((prev) => prev + 1);
+    }
+  }, [retryCount]);
 
   return <ErrorBoundary key={retryCount} onInitError={onError} fallback={DisplayError} >
     <div ref={ref} id="sample-container" />

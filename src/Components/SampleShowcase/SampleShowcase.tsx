@@ -71,8 +71,6 @@ export const SampleShowcase: FunctionComponent = () => {
     <div id="sample-container" className="sample-content" style={{ height: "100%" }}>
       <React.Suspense fallback={spinner}>
         <Visualizer
-          iModelName={activeSample.imodel}
-          iModelSelector={getImodelSelector()}
           transpileResult={transpileResult}
           type={activeSample.type} />
       </React.Suspense>
