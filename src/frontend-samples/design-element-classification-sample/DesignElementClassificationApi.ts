@@ -4,14 +4,17 @@
 *--------------------------------------------------------------------------------------------*/
 
 import { ColorDef, FeatureOverrideType } from "@bentley/imodeljs-common";
-import { EmphasizeElements, IModelApp, MarginPercent, ScreenViewport, ViewChangeOptions } from "@bentley/imodeljs-frontend";
+import { AuthorizedFrontendRequestContext, EmphasizeElements, IModelApp, MarginPercent, ScreenViewport, ViewChangeOptions } from "@bentley/imodeljs-frontend";
+import DesignElementClassificationClient from "./DesignElementClassificationClient";
 import { labelColors } from "./DesignElementClassificationLabelsColors";
 
 export default class DesignElementClassificationApi {
 
-  public static readonly Run_Id = "67511bbe-8e0c-4786-b0f4-01078b9cb860";
+  public static readonly Run_Id = "05a2dbf0-229e-4faa-b9f6-78c5f220009b";
 
   private static _applyEmphasize: Boolean = true;
+  private static _misclassificationsData: {};
+  private static _requestContext: AuthorizedFrontendRequestContext;
 
   public static async visualizeElements(elements: { [key: string]: string }) {
     if (!DesignElementClassificationApi._applyEmphasize)
@@ -23,11 +26,11 @@ export default class DesignElementClassificationApi {
     const vp = IModelApp.viewManager.selectedView;
     const emph = EmphasizeElements.getOrCreate(vp);
 
-    DesignElementClassificationApi.clearEmphasizeElements(vp, emph)
+    DesignElementClassificationApi.clearEmphasizeElements(vp, emph);
 
     const elementsIds = Object.keys(elements);
     for (const elementKey in elementsIds) {
-      emph.overrideElements(elementKey, vp, DesignElementClassificationApi.getLabelColor(elements[elementKey]), FeatureOverrideType.ColorOnly, true);
+      emph.overrideElements(elementsIds[elementKey], vp, DesignElementClassificationApi.getLabelColor(elements[elementsIds[elementKey]]), FeatureOverrideType.ColorOnly, false);
     }
     DesignElementClassificationApi.emphasizeElements(vp, emph, elementsIds)
     DesignElementClassificationApi.zoomElements(vp, elementsIds);
@@ -46,7 +49,7 @@ export default class DesignElementClassificationApi {
     DesignElementClassificationApi.clearEmphasizeElements(vp, emph)
 
     for (const elementId of elementsIds)
-      emph.overrideElements(elementId, vp, DesignElementClassificationApi.getLabelColor(label), FeatureOverrideType.ColorOnly, true);
+      emph.overrideElements(elementId, vp, DesignElementClassificationApi.getLabelColor(label), FeatureOverrideType.ColorOnly, false);
 
     DesignElementClassificationApi.emphasizeElements(vp, emph, elementsIds)
     DesignElementClassificationApi.zoomElements(vp, elementsIds);
@@ -79,6 +82,23 @@ export default class DesignElementClassificationApi {
 
   public static setEmphasisMode(enabled: Boolean = true) {
     DesignElementClassificationApi._applyEmphasize = enabled;
+  }
+
+  public static getMisclassificationData = async (): Promise<any> => {
+    if (DesignElementClassificationApi._misclassificationsData)
+      return DesignElementClassificationApi._misclassificationsData;
+
+    let requestContext = await DesignElementClassificationApi.getRequestContext();
+
+    DesignElementClassificationApi._misclassificationsData = DesignElementClassificationClient.getClassificationPredictionResults(DesignElementClassificationApi.Run_Id, requestContext);
+    return DesignElementClassificationApi._misclassificationsData;
+  }
+
+  private static async getRequestContext() {
+    if (!DesignElementClassificationApi._requestContext) {
+      DesignElementClassificationApi._requestContext = await AuthorizedFrontendRequestContext.create();
+    }
+    return DesignElementClassificationApi._requestContext;
   }
 
   private static clearEmphasizeElements(vp: ScreenViewport, emph: EmphasizeElements) {

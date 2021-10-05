@@ -20,44 +20,33 @@ import React, { useCallback, useEffect, useState } from "react";
 import DesignElementClassificationApi from "./DesignElementClassificationApi";
 import { IModelApp } from "@bentley/imodeljs-frontend";
 import { Slider, Spinner, SpinnerSize } from "@bentley/ui-core";
-import DesignElementClassificationClient from "./DesignElementClassificationClient";
-
-interface Misclassifications {
-  failures: any[],
-  failuresSchema: any,
-  predictionLabels: string[],
-  currentLabels: string[]
-}
 
 const DesignElementClassificationTableWidget: React.FunctionComponent = () => {
-  const defaultConfidenceValue = 0.6;
   const elements: { [key: string]: string } = {};
 
   const [filteredData, setfilteredData] = useState([]);
-  const [misclassifications, setMisclassifications] = useState<Misclassifications>();
+  const [misclassifications, setMisclassifications] = useState<any>();
   const [loading, setLoading] = useState(true);
+  const [sliderValue, setSliderValue] = useState(0.6);
 
   useEffect(() => {
-    DesignElementClassificationClient.getClassificationPredictionResults(DesignElementClassificationApi.Run_Id)
+    DesignElementClassificationApi.getMisclassificationData()
       .then(data => {
-        setMisclassifications({
-          ...misclassifications,
-          predictionLabels: data.mlClassStringMap,
-          currentLabels: data.categoryLabelStringMap,
-          failures: data.classificationFailures,
-          failuresSchema: data.classificationFailuresSchema
-        });
-        setLoading(false);
+        if (data) {
+          console.log(data)
+          setMisclassifications(data);
+          setLoading(false);
+        }
       });
     return () => undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (loading === false && misclassifications?.failures)
-      setfilteredData(misclassifications?.failures.filter((item) => item[misclassifications?.failuresSchema.Top1Confidence.index] >= defaultConfidenceValue) as [])
-
+    if (loading === false && misclassifications)
+      setfilteredData(misclassifications.classificationFailures.filter((item: []) => item[misclassifications.classificationFailuresSchema.Confidence.index] >= sliderValue) as [])
     return () => undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, misclassifications]);
 
   const _getDataProvider = useCallback((): SimpleTableDataProvider => {
@@ -65,19 +54,13 @@ const DesignElementClassificationTableWidget: React.FunctionComponent = () => {
     // adding columns
     const columns: ColumnDescription[] = [];
 
-    columns.push({ key: "element_id", label: "Instance id", sortable: true });
-    columns.push({ key: "current_class", label: "Original class", sortable: true });
-    columns.push({ key: "max_class", label: "Predicted class", sortable: true });
-    columns.push({ key: "max_class_confidence", label: "Predicted class confidence", sortable: true });
+    columns.push({ key: "ECInstanceId", label: "Instance id", sortable: true });
+    columns.push({ key: "CategoryLabel", label: "Original class", sortable: true });
+    columns.push({ key: "Top1Prediction", label: "Predicted class", sortable: true });
+    columns.push({ key: "Top1Confidence", label: "Predicted class confidence", sortable: true });
+    columns.push({ key: "Confidence", label: "Classification Confidence", sortable: true });
 
     const dataProvider = new SimpleTableDataProvider(columns);
-
-    if (loading)
-      return dataProvider;
-
-    let categoryLabelSchema = misclassifications?.failuresSchema.CategoryLabel;
-    let misclassifiedLabelSchema = misclassifications?.failuresSchema.Top1Prediction;
-    let misclassifiedConfidence = misclassifications?.failuresSchema.Top1Confidence;
 
     // adding rows => cells => property record => value and description.
     filteredData.forEach((rowData) => {
@@ -85,23 +68,7 @@ const DesignElementClassificationTableWidget: React.FunctionComponent = () => {
       const rowItem: RowItem = { key: rowItemKey, cells: [] };
 
       columns.forEach((column: ColumnDescription) => {
-        let cellValue = '';
-
-        switch (column.key) {
-          case "element_id":
-            cellValue = rowData[0];
-            break;
-          case "current_class":
-            cellValue = misclassifications?.currentLabels[rowData[categoryLabelSchema.index]] ?? '';
-            break;
-          case "max_class":
-            cellValue = misclassifications?.predictionLabels[rowData[misclassifiedLabelSchema.index]] ?? '';
-            break;
-          case "max_class_confidence":
-            cellValue = `${rowData[misclassifiedConfidence.index]}`;
-            break;
-        }
-
+        let cellValue = getCellValue(column.key, rowData);
         const value: PropertyValue = { valueFormat: PropertyValueFormat.Primitive, value: cellValue };
         const description: PropertyDescription = { displayLabel: column.label, name: column.key, typename: "string" };
         rowItem.cells.push({ key: column.key, record: new PropertyRecord(value, description) });
@@ -109,9 +76,18 @@ const DesignElementClassificationTableWidget: React.FunctionComponent = () => {
 
       dataProvider.addRow(rowItem);
     })
+    console.log(dataProvider)
     return dataProvider;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredData])
+
+  const getCellValue = (columKey: string, rowData: any) => {
+    let schemaValue = misclassifications?.classificationFailuresSchema[columKey]
+    let index = schemaValue?.index;
+    let stringMap = schemaValue?.stringMap;
+    let cellValue = stringMap ? misclassifications[stringMap][rowData[index]] : `${rowData[index]}`;
+    return cellValue;
+  }
 
   // zooming into and highlighting element when row is selected.
   const _onRowsSelected = async (rowIterator: AsyncIterableIterator<RowItem>): Promise<boolean> => {
@@ -141,13 +117,15 @@ const DesignElementClassificationTableWidget: React.FunctionComponent = () => {
   const _onSliderValueChanged = (values: ReadonlyArray<number>) => {
     DesignElementClassificationApi.clearMisclassifiedEmphasizeElements();
 
-    if (misclassifications?.failures)
-      setfilteredData(misclassifications.failures.filter((item) => item[misclassifications?.failuresSchema.Top1Confidence.index] >= values[0]) as []);
+    setSliderValue(values[0]);
+
+    if (misclassifications?.classificationFailures)
+      setfilteredData(misclassifications.classificationFailures.filter((item: []) => item[misclassifications?.classificationFailuresSchema.Confidence.index] >= values[0]) as []);
   };
 
   return (
     <>
-      {!misclassifications ? <div><Spinner size={SpinnerSize.Small} /> Loading ...</div> :
+      {loading ? <div><Spinner size={SpinnerSize.Small} /> Loading ...</div> :
         <div className="full-height">
           <div className="sample-options">
             <span>Predicted class confidence slider:</span>
@@ -155,7 +133,7 @@ const DesignElementClassificationTableWidget: React.FunctionComponent = () => {
               className="sample-options-center"
               min={0}
               max={1}
-              values={[defaultConfidenceValue]}
+              values={[sliderValue]}
               step={0.01}
               showTooltip
               showMinMax

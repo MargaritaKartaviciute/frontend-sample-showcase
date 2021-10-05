@@ -4,12 +4,13 @@
 *--------------------------------------------------------------------------------------------*/
 
 import React, { FunctionComponent, useState } from "react";
-import { AuthorizationClient, default3DSandboxUi, SampleIModels, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
+import { AuthorizationClient, default2DSandboxUi, default3DSandboxUi, SampleIModels, useSampleWidget, ViewSetup } from "@itwinjs-sandbox";
 import { Viewer } from "@itwin/web-viewer-react";
-import { IModelConnection } from "@bentley/imodeljs-frontend";
+import { IModelConnection, StandardViewId } from "@bentley/imodeljs-frontend";
 import { IModelViewportControlOptions } from "@bentley/ui-framework";
 import { DesignElementClassificationTableWidgetProvider } from "./DesignElementClassificationTableWidget";
 import { DesignElementClassificationLabelsProvider } from "./DesignElementClassificationLabelsWidget";
+import "./design-element-classification.scss";
 
 const uiProviders = [new DesignElementClassificationLabelsProvider(), new DesignElementClassificationTableWidgetProvider()];
 
@@ -19,6 +20,12 @@ const ViewportOnlyApp: FunctionComponent = () => {
 
   const _oniModelReady = async (iModelConnection: IModelConnection) => {
     const viewState = await ViewSetup.getDefaultView(iModelConnection);
+    viewState.setStandardRotation(StandardViewId.Iso);
+
+    const range = viewState.computeFitRange();
+    const aspect = viewState.getAspectRatio();
+
+    viewState.lookAtVolume(range, aspect);
     setViewportOptions({ viewState });
   };
 

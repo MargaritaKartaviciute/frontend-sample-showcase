@@ -3,13 +3,13 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 
-import { IncludePrefix, RequestOptions } from "@bentley/itwin-client";
-import { IModelApp } from "@bentley/imodeljs-frontend";
+import { IncludePrefix, request, RequestOptions } from "@bentley/itwin-client";
+import { AuthorizedFrontendRequestContext, IModelApp } from "@bentley/imodeljs-frontend";
 import { AuthorizationClient } from "@itwinjs-sandbox";
 
 export default class DesignElementClassificationClient {
 
-  public static async getClassificationPredictionResults(runId: string): Promise<any | undefined> {
+  public static async getClassificationPredictionResults(runId: string, requestContext: AuthorizedFrontendRequestContext): Promise<any | undefined> {
     const accessToken = await DesignElementClassificationClient.getAccessToken();
 
     if (accessToken === undefined)
@@ -24,12 +24,13 @@ export default class DesignElementClassificationClient {
       },
     };
 
-    // hack to handle redirect 
-    var response = await fetch(url, { method: options.method, headers: options.headers });
-    if (response.redirected && !response.ok)
-      response = await fetch(response.url);
-
-    return response.json();
+    return request(requestContext, url, options)
+      .then((resp) => {
+        if (resp.text === undefined) return undefined;
+        return JSON.parse(resp.text as string);
+      }).catch((_reason: any) => {
+        return undefined;
+      });
   }
 
   private static async getAccessToken() {

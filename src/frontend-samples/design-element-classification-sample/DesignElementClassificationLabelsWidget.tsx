@@ -14,52 +14,52 @@ import { ColorPickerButton } from '@bentley/ui-components';
 import * as React from 'react';
 import { BodyText, Spinner, SpinnerSize, Toggle } from '@bentley/ui-core';
 import DesignElementClassificationApi from './DesignElementClassificationApi';
-import DesignElementClassificationClient from './DesignElementClassificationClient';
 import { useEffect, useState } from 'react';
 
-interface Misclassifications {
-  labels: string[],
-  elementIds: string[],
-  failures: any[],
-}
-
 const DesignElementClassificationLabelsWidget: React.FunctionComponent = () => {
-  const [misclassifications, setMisclassifications] = useState<Misclassifications>();
-  const [loading, setLoading] = useState(true);
+  const [misclassifications, setMisclassifications] = useState<any>();
+  const [loading, setLoading] = useState<boolean>(true);
   const [applyEmphasis, setApplyEmphasis] = useState<boolean>(true);
+  const [imodelIds, setIModelIds] = useState<string[]>([]);
 
   useEffect(() => {
-    DesignElementClassificationClient.getClassificationPredictionResults(DesignElementClassificationApi.Run_Id)
+    DesignElementClassificationApi.getMisclassificationData()
       .then(data => {
-        setMisclassifications({
-          ...misclassifications,
-          labels: data.mlClassStringMap,
-          elementIds: data.classificationFailures?.map((x: any[]) => x[0]),
-          failures: data.classificationFailures
-        });
-        setLoading(false);
+        if (data) {
+          setMisclassifications(data);
+          setLoading(false);
+        }
       });
     return () => undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (!loading && misclassifications) {
+      let elementsIds = misclassifications.classificationFailures
+        .map((x: []) => x[misclassifications.classificationFailuresSchema.ECInstanceId.index]) as string[]
+      setIModelIds(elementsIds);
+    }
+    return () => undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, misclassifications]);
+
   // emphasize all misclassified elements when iModel loaded
   useEffect(() => {
-    if (loading === false && misclassifications && misclassifications.elementIds)
-      DesignElementClassificationApi.emphasizeMisclassifiedElements(misclassifications.elementIds);
-  }, [loading, misclassifications]);
+    if (loading === false && imodelIds)
+      DesignElementClassificationApi.emphasizeMisclassifiedElements(imodelIds);
+    return () => undefined;
+  }, [loading, imodelIds]);
 
   // enable or disable elements emphasis
   useEffect(() => {
-    if (applyEmphasis)
-      DesignElementClassificationApi.setEmphasisMode(true);
-    else
-      DesignElementClassificationApi.setEmphasisMode(false);
+    DesignElementClassificationApi.setEmphasisMode(applyEmphasis);
+    return () => undefined;
   }, [applyEmphasis]);
 
   const _handleToggleChange = (wantEmphasis: boolean) => {
-    if (!applyEmphasis && misclassifications)
-      DesignElementClassificationApi.emphasizeMisclassifiedElements(misclassifications.elementIds);
+    if (!applyEmphasis && imodelIds)
+      DesignElementClassificationApi.emphasizeMisclassifiedElements(imodelIds);
     else
       DesignElementClassificationApi.clearMisclassifiedEmphasizeElements();
 
@@ -68,16 +68,16 @@ const DesignElementClassificationLabelsWidget: React.FunctionComponent = () => {
 
   // highlight all elements by selected label
   const _highlightElementsByLable = (label: string) => {
-    let elementsIds = misclassifications?.failures
-      .filter(f => misclassifications.labels[f[13]] === label)
-      .map((x) => x[0]) as string[];
+    let elementsIds = misclassifications?.classificationFailures
+      .filter((item: []) => misclassifications.mlClassStringMap[item[misclassifications?.classificationFailuresSchema.Top1Prediction.index]] === label)
+      .map((x: []) => x[misclassifications?.classificationFailuresSchema.ECInstanceId.index]) as string[];
 
     DesignElementClassificationApi.visualizeElementsByLabel(elementsIds, label);
   };
 
   return (
     <>
-      {!misclassifications ? <div><Spinner size={SpinnerSize.Small} /> Loading ...</div> :
+      {loading || !misclassifications ? <div><Spinner size={SpinnerSize.Small} /> Loading ...</div> :
         <div className="sample-options">
           <div className="sample-options-center">
             <span>Highlight misclassified elements</span>
@@ -87,7 +87,7 @@ const DesignElementClassificationLabelsWidget: React.FunctionComponent = () => {
             <span>Misclassified elements labels:</span>
           </div>
           {
-            misclassifications.labels?.map((label, index) => {
+            misclassifications.mlClassStringMap?.map((label: string, index: number) => {
               return (
                 <div key={index} onClick={() => _highlightElementsByLable(label)}>
                   <ColorPickerButton
